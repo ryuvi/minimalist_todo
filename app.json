@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "minimalist_todo",
+    "name": "Simple Todo",
     "slug": "minimalist_todo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,10 +20,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.vi_rafinha.minimalist_todo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

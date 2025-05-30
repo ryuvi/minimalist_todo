@@ -1,20 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'expo-router/entry'
+// import { useColorScheme } from "react-native";
+// import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
+// import { greenPastelLightTheme } from "./theme/pallet/Light";
+// import { greenPastelDarkTheme } from "./theme/pallet/Dark";
+// import Home from "./src/Home";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+// export default function Layout() {
+//     const colorScheme = useColorScheme();
+//     const customTheme = colorScheme === "dark" ? greenPastelDarkTheme : greenPastelLightTheme;
+//     const md3 = colorScheme === "dark" ? MD3DarkTheme : MD3LightTheme;
+//     const theme = {
+//       ...md3,
+//       colors: {
+//         ...md3.colors,
+//         ...customTheme.colors
+//       }
+//     }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+//   return (
+//     <PaperProvider theme={theme}>
+//         <Home />
+//     </PaperProvider>
+//   );
+// }
