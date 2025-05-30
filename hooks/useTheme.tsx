@@ -1,25 +1,17 @@
-// context/ThemeProvider.tsx
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  ReactNode,
-  FC,
-} from "react";
-import {
-  Provider as PaperProvider,
-  MD3Theme as PaperTheme,
-} from "react-native-paper";
-import { useColorScheme } from "react-native";
+// useTheme.tsx
+import { create } from 'zustand';
+import { persist, PersistOptions, PersistStorage } from 'zustand/middleware';
+import { useColorScheme, Appearance } from 'react-native';
+import { PaperProvider, MD3Theme as PaperTheme } from 'react-native-paper';
+import { ReactNode, useEffect, useState } from 'react';
 
-import * as lightTheme from "../theme/pallet/Light";
-import * as darkTheme from "../theme/pallet/Dark";
-import { settingsDbService } from "../service/settingsDbService";
+import * as lightTheme from '../theme/pallet/Light';
+import * as darkTheme from '../theme/pallet/Dark';
+import { themeStore } from './store';
 
-// Tipos
-export type ThemeKey = "green" | "pink" | "red" | "yellow" | "purple" | "mint" | "lilac";
+export type ThemeKey = 'green' | 'pink' | 'red' | 'yellow' | 'purple' | 'mint' | 'lilac';
 
-const themeMap: Record<"light" | "dark", Record<ThemeKey, PaperTheme>> = {
+const themeMap: Record<'light' | 'dark', Record<ThemeKey, PaperTheme>> = {
   light: {
     green: lightTheme.greenPastelLightTheme,
     pink: lightTheme.pinkPastelLightTheme,
@@ -40,46 +32,57 @@ const themeMap: Record<"light" | "dark", Record<ThemeKey, PaperTheme>> = {
   },
 };
 
-interface ThemeContextProps {
-  currentTheme: PaperTheme;
-  currentThemeKey: ThemeKey;
-  changeTheme: (themeKey: ThemeKey) => void;
+interface ThemeState {
+  themeKey: ThemeKey;
+  setThemeKey: (key: ThemeKey) => void;
 }
 
-export const ThemeContext = createContext<ThemeContextProps>({
-  currentTheme: lightTheme.greenPastelLightTheme,
-  currentThemeKey: "green",
-  changeTheme: () => {},
-});
+export const useThemeStore = create<ThemeState>()(
+  persist(
+    (set) => ({
+      themeKey: 'green',
+      setThemeKey: (key) => set({ themeKey: key }),
+    }),
+    {
+      name: 'theme-storage',
+      storage: themeStore,
+    } as unknown as PersistOptions<ThemeState>
+  )
+);
 
-const isValidThemeKey = (key: any): key is ThemeKey =>
-  Object.keys(themeMap.light).includes(key);
+/**
+ * Hook para acessar o tema atual e alterar o tema.
+ * Retorna:
+ *  - theme: tema do react-native-paper baseado no esquema e tema selecionado
+ *  - themeKey: chave do tema (green, pink, ...)
+ *  - setThemeKey: função para alterar o tema
+ */
+export function useTheme() {
+  const themeKey = useThemeStore((state) => state.themeKey);
+  const setThemeKey = useThemeStore((state) => state.setThemeKey);
+  const systemScheme = useColorScheme() ?? 'light'; // pode ser 'light' | 'dark'
 
-export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const systemColorScheme = useColorScheme();
-  const colorScheme = systemColorScheme === "dark" ? "dark" : "light";
+  // monta o tema baseado no esquema e tema escolhido
+  const theme = themeMap[systemScheme][themeKey];
 
-  const [currentThemeKey, setCurrentThemeKey] = useState<ThemeKey>("green");
+  return { theme, themeKey, setThemeKey };
+}
 
-  useEffect(() => {
-    (async () => {
-      const storedKey = await settingsDbService.getThemeKey();
-      if (storedKey && isValidThemeKey(storedKey)) {
-        setCurrentThemeKey(storedKey);
-      }
-    })();
-  }, []);
+/**
+ * Componente para prover o PaperProvider com o tema correto
+ */
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const { theme } = useTheme();
 
-  const changeTheme = (themeKey: ThemeKey) => {
-    setCurrentThemeKey(themeKey);
-    settingsDbService.saveThemeKey(themeKey);
-  };
+  return <PaperProvider theme={theme}>{children}</PaperProvider>;
+};
 
-  const currentTheme = themeMap[colorScheme][currentThemeKey];
-
-  return (
-    <ThemeContext.Provider value={{ currentTheme, currentThemeKey, changeTheme }}>
-      <PaperProvider theme={currentTheme}>{children}</PaperProvider>
-    </ThemeContext.Provider>
-  );
+/**
+ * Para casos não-React (ex: código fora de componentes)
+ * Retorna o tema atual síncrono baseado no estado e esquema do sistema
+ */
+export const getCurrentTheme = (): PaperTheme => {
+  const scheme = Appearance.getColorScheme() === 'dark' ? 'dark' : 'light';
+  const key = useThemeStore.getState().themeKey;
+  return themeMap[scheme][key];
 };

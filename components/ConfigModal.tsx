@@ -1,8 +1,9 @@
+// ConfigModal
 import React, { useState, useContext } from "react";
 import { View } from "react-native";
 import { Modal, Portal, Button, Text } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
-import { ThemeContext, ThemeKey } from "../hooks/useTheme"; // ajuste o path se necessário
+import { useTheme, ThemeKey } from "../hooks/useTheme"; // ajuste o path se necessário
 
 const themeOptions = [
   { label: "Green Pastel", value: "green" },
@@ -22,12 +23,12 @@ interface ConfigModalProps {
 export const ConfigModal: React.FC<ConfigModalProps> = ({ visible, onDismiss }) => {
   const [showDropDown, setShowDropDown] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey | undefined>();
+  const { themeKey, setThemeKey } = useTheme();
 
-  const { currentThemeKey, changeTheme } = useContext(ThemeContext);
 
   const handleSave = () => {
     if (selectedTheme) {
-      changeTheme(selectedTheme);
+      setThemeKey(selectedTheme);
     }
     onDismiss();
   };
@@ -43,7 +44,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ visible, onDismiss }) 
         <Dropdown
           label={"Tema da Aplicação"}
           mode={"outlined"}
-          value={selectedTheme ?? currentThemeKey}
+          value={selectedTheme ?? themeKey}
           onSelect={(value) => setSelectedTheme(value as ThemeKey)}
           options={themeOptions}
         />

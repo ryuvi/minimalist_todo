@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, PersistOptions } from "zustand/middleware";
-import {zustandStorage} from "../hooks/store"; // 👈 import novo
+import {itemsStore} from "../hooks/store"; // 👈 import novo
 
 export interface Todo {
   id: string;
@@ -50,7 +50,7 @@ export const useTodosStore = create<TodosState>()(
     }),
     {
       name: "todos-storage",
-      storage: zustandStorage, // 👈 aqui
+      storage: itemsStore, // 👈 aqui
     } as unknown as PersistOptions<TodosState>
   )
 );

@@ -1,3 +1,4 @@
+// index
 import { useState } from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
 import {
@@ -11,9 +12,9 @@ import {
   Badge,
   Chip,
 } from "react-native-paper";
-import { Swipeable } from 'react-native-gesture-handler';
-import * as Haptics from 'expo-haptics';
-import { useRef, useEffect } from 'react';
+import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
+import * as Haptics from "expo-haptics";
+import { useRef, useEffect } from "react";
 
 import Header from "../components/Header";
 import ModalAdd from "../components/ModalAdd";
@@ -94,6 +95,116 @@ function AnimatedTodoItem({
   );
 }
 
+function TodoItem({ item, index, deletedItems, onDelete, onComplete, onOpen }) {
+  const animation = useRef(new Animated.Value(1)).current;
+  const theme = useTheme();
+
+  useEffect(() => {
+    if (deletedItems.includes(item.id)) {
+      Animated.timing(animation, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [deletedItems]);
+
+  const renderLeftActions = () => (
+    <View
+      style={{
+        backgroundColor: "#ef5350",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        paddingLeft: 20,
+        flex: 1,
+      }}
+    >
+      <Text style={{ color: "white", fontWeight: "bold" }}>Excluir</Text>
+    </View>
+  );
+
+  const renderRightActions = () => (
+    <View
+      style={{
+        backgroundColor: "#66bb6a",
+        justifyContent: "center",
+        alignItems: "flex-end",
+        paddingRight: 20,
+        flex: 1,
+      }}
+    >
+      <Text style={{ color: "white", fontWeight: "bold" }}>Concluir</Text>
+    </View>
+  );
+
+  const handleSwipeDelete = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    onDelete(item.id);
+  };
+
+  const handleSwipeComplete = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onComplete(item.id);
+  };
+
+  return (
+    <AnimatedTodoItem index={index}>
+      <Swipeable
+        renderLeftActions={renderLeftActions}
+        renderRightActions={renderRightActions}
+        onSwipeableLeftOpen={handleSwipeDelete}
+        onSwipeableRightOpen={handleSwipeComplete}
+      >
+        <TouchableOpacity onPress={() => onOpen(item)}>
+          <Card
+            key={item.id}
+            mode="elevated"
+            style={{
+              margin: 10,
+              backgroundColor: theme.colors.surface,
+              borderWidth: 2,
+              borderColor: item.completed
+                ? "gray"
+                : getDueDateColor(new Date(item.dueDate)),
+              opacity: item.completed ? 0.6 : 1,
+            }}
+          >
+            <Badge
+              visible
+              style={{
+                position: "absolute",
+                top: 5,
+                right: 5,
+              }}
+            >
+              {item.priority}
+            </Badge>
+            <Card.Title title={item.title} />
+            <Card.Content>
+              {item.tag ? (
+                <Text style={{ marginTop: 4, fontStyle: "italic" }}>
+                  Tag: {item.tag}
+                </Text>
+              ) : null}
+            </Card.Content>
+            <View
+              style={{
+                justifyContent: "flex-end",
+                flexDirection: "row",
+                marginRight: 5,
+              }}
+            >
+              <Text style={{ color: "gray" }}>
+                Prazo: {formatDate(new Date(item.dueDate))}
+              </Text>
+            </View>
+          </Card>
+        </TouchableOpacity>
+      </Swipeable>
+    </AnimatedTodoItem>
+  );
+}
+
 export default function Index() {
   const theme = useTheme();
   const [fabOpen, setFabOpen] = useState(false);
@@ -109,7 +220,6 @@ export default function Index() {
     normal: false,
   });
   const [deletedItems, setDeletedItems] = useState<string[]>([]);
-
 
   // Zustand store
   const todos = useTodosStore((state) => state.todos);
@@ -166,119 +276,6 @@ export default function Index() {
     toggleTodo(item.id);
   };
 
-  const renderItem = ({ item }: { item: Todo }) => {
-  const animation = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    if (deletedItems.includes(item.id)) {
-      Animated.timing(animation, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [deletedItems]);
-
-  const renderLeftActions = () => (
-    <View
-      style={{
-        backgroundColor: "#ef5350",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        paddingLeft: 20,
-        flex: 1,
-      }}
-    >
-      <Text style={{ color: "white", fontWeight: "bold" }}>Excluir</Text>
-    </View>
-  );
-
-  const renderRightActions = () => (
-    <View
-      style={{
-        backgroundColor: "#66bb6a",
-        justifyContent: "center",
-        alignItems: "flex-end",
-        paddingRight: 20,
-        flex: 1,
-      }}
-    >
-      <Text style={{ color: "white", fontWeight: "bold" }}>Concluir</Text>
-    </View>
-  );
-
-  const handleSwipeDelete = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setDeletedItems((prev) => [...prev, item.id]);
-    setTimeout(() => {
-      useTodosStore.getState().removeTodo?.(item.id);
-    }, 250);
-  };
-
-  const handleSwipeComplete = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    toggleTodo(item.id);
-  };
-
-  return (
-    <AnimatedTodoItem index={index}>
-      <Swipeable
-        renderLeftActions={renderLeftActions}
-        renderRightActions={renderRightActions}
-        onSwipeableLeftOpen={handleSwipeDelete}
-        onSwipeableRightOpen={handleSwipeComplete}
-      >
-        <TouchableOpacity onPress={() => handleOpenViewModal(item)}>
-          <Card
-            key={item.id}
-            mode="elevated"
-            style={{
-              margin: 10,
-              backgroundColor: theme.colors.surface,
-              borderWidth: 2,
-              borderColor: item.completed
-                ? "gray"
-                : getDueDateColor(new Date(item.dueDate)),
-              opacity: item.completed ? 0.6 : 1,
-            }}
-          >
-            <Badge
-              visible
-              style={{
-                position: "absolute",
-                top: 5,
-                right: 5,
-              }}
-            >
-              {item.priority}
-            </Badge>
-            <Card.Title title={item.title} />
-            <Card.Content>
-              {item.tag ? (
-                <Text style={{ marginTop: 4, fontStyle: "italic" }}>
-                  Tag: {item.tag}
-                </Text>
-              ) : null}
-            </Card.Content>
-            <View
-              style={{
-                justifyContent: "flex-end",
-                flexDirection: "row",
-                marginRight: 5,
-              }}
-            >
-              <Text style={{ color: "gray" }}>
-                Prazo: {formatDate(new Date(item.dueDate))}
-              </Text>
-            </View>
-          </Card>
-        </TouchableOpacity>
-      </Swipeable>
-    </AnimatedTodoItem>
-  );
-};
-
-
   const filterTodos = (todos: Todo[]) => {
     return todos.filter(
       (todo) =>
@@ -291,6 +288,7 @@ export default function Index() {
 
   return (
     <ThemeProvider>
+      <GestureHandlerRootView>
       <Portal.Host>
         <Header />
 
@@ -321,7 +319,7 @@ export default function Index() {
                     setIsFiltered((prev) => ({ ...prev, [item]: !prev[item] }))
                   }
                   style={{ marginRight: 5, marginTop: 5 }}
-                  mode={isFiltered[item] ? 'outlined': 'flat'}
+                  mode={isFiltered[item] ? "outlined" : "flat"}
                 >
                   {item} ({count})
                 </Chip>
@@ -334,9 +332,27 @@ export default function Index() {
           <ActivityIndicator style={{ marginTop: 40 }} />
         ) : (
           <Animated.FlatList
-            data={ Object.values(isFiltered).some(Boolean) ? filterTodos(todos) : todos}
+            data={
+              Object.values(isFiltered).some(Boolean)
+                ? filterTodos(todos)
+                : todos
+            }
             keyExtractor={(item) => item.id}
-            renderItem={renderItem}
+            renderItem={({ item, index }) => (
+              <TodoItem
+                item={item}
+                index={index}
+                deletedItems={deletedItems}
+                onDelete={(id) => {
+                  setDeletedItems((prev) => [...prev, id]);
+                  setTimeout(() => {
+                    useTodosStore.getState().removeTodo?.(id);
+                  }, 250);
+                }}
+                onComplete={toggleTodo}
+                onOpen={handleOpenViewModal}
+              />
+            )}
             onScroll={handleScroll}
             style={{ marginTop: 10 }}
           />
@@ -386,6 +402,7 @@ export default function Index() {
           />
         </Portal>
       </Portal.Host>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

@@ -4,11 +4,11 @@
     "slug": "minimalist_todo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/prioriza.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,14 +17,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/prioriza.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.vi_rafinha.minimalist_todo"
+      "package": "com.hero.prioriza"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/prioriza.png"
     },
     "plugins": [
       "expo-router"

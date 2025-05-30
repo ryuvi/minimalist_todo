@@ -1,4 +1,4 @@
-package com.vi_rafinha.minimalist_todo
+package com.hero.prioriza
 
 import android.os.Build
 import android.os.Bundle
