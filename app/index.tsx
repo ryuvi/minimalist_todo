@@ -161,7 +161,7 @@ function TodoItem({ item, index, deletedItems, onDelete, onComplete, onOpen }) {
             mode="elevated"
             style={{
               margin: 10,
-              backgroundColor: theme.colors.surface,
+              backgroundColor: theme.colors.secondaryContainer,
               borderWidth: 2,
               borderColor: item.completed
                 ? "gray"
@@ -194,7 +194,7 @@ function TodoItem({ item, index, deletedItems, onDelete, onComplete, onOpen }) {
                 marginRight: 5,
               }}
             >
-              <Text style={{ color: "gray" }}>
+              <Text style={{ color: theme.colors.tertiary }}>
                 Prazo: {formatDate(new Date(item.dueDate))}
               </Text>
             </View>
@@ -259,18 +259,22 @@ export default function Index() {
   };
 
   const handleAdd = () => {
-    setSelectedItem({
-      id: "",
-      title: "",
-      description: "",
-      completed: false,
-      priority: 3,
-      createdAt: new Date().toISOString(),
-      dueDate: new Date().toISOString(),
-      tag: "",
-    });
-    setModalVisible(true);
-  };
+  const today = new Date();
+  today.setDate(today.getDate() + 7); // modifica o objeto `today`
+
+  setSelectedItem({
+    id: "",
+    title: "",
+    description: "",
+    completed: false,
+    priority: 3,
+    createdAt: new Date().toISOString(),
+    dueDate: today.toISOString(), // agora sim, convertido corretamente
+    tag: "",
+  });
+  setModalVisible(true);
+};
+
 
   const handleComplete = (item: Todo) => {
     toggleTodo(item.id);
@@ -287,8 +291,7 @@ export default function Index() {
   };
 
   return (
-    <ThemeProvider>
-      <GestureHandlerRootView>
+      <GestureHandlerRootView style={{ backgroundColor: theme.colors.surface, flex: 1 }}>
       <Portal.Host>
         <Header />
 
@@ -298,6 +301,7 @@ export default function Index() {
             keyExtractor={(item) => item}
             horizontal
             showsHorizontalScrollIndicator={false}
+            style={{  }}
             contentContainerStyle={{ paddingHorizontal: 10 }}
             renderItem={({ item }) => {
               const count = todos.filter((todo) => {
@@ -354,7 +358,7 @@ export default function Index() {
               />
             )}
             onScroll={handleScroll}
-            style={{ marginTop: 10 }}
+            
           />
         )}
 
@@ -403,6 +407,5 @@ export default function Index() {
         </Portal>
       </Portal.Host>
       </GestureHandlerRootView>
-    </ThemeProvider>
   );
 }

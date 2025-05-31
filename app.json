@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Simple Todo",
-    "slug": "minimalist_todo",
-    "version": "1.0.0",
+    "name": "Prioriza",
+    "slug": "prioriza",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/prioriza.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",

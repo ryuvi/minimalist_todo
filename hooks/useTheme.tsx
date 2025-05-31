@@ -60,10 +60,14 @@ export const useThemeStore = create<ThemeState>()(
 export function useTheme() {
   const themeKey = useThemeStore((state) => state.themeKey);
   const setThemeKey = useThemeStore((state) => state.setThemeKey);
-  const systemScheme = useColorScheme() ?? 'light'; // pode ser 'light' | 'dark'
+
+  const systemScheme = Appearance.getColorScheme() === 'dark' ? 'dark' : 'light'; // pode ser 'light' | 'dark'
+  // const systemScheme = 'dark'; // pode ser 'light' | 'dark'
 
   // monta o tema baseado no esquema e tema escolhido
   const theme = themeMap[systemScheme][themeKey];
+  console.warn(Appearance.getColorScheme())
+  console.log(systemScheme);
 
   return { theme, themeKey, setThemeKey };
 }
@@ -82,7 +86,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
  * Retorna o tema atual síncrono baseado no estado e esquema do sistema
  */
 export const getCurrentTheme = (): PaperTheme => {
-  const scheme = Appearance.getColorScheme() === 'dark' ? 'dark' : 'light';
+  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const key = useThemeStore.getState().themeKey;
   return themeMap[scheme][key];
 };
