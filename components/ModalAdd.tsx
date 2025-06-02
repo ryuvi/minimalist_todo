@@ -5,7 +5,6 @@ import {
   Text,
   TextInput,
   Button,
-  RadioButton,
   useTheme,
 } from "react-native-paper";
 import { Todo } from "../hooks/useItemsStore";
@@ -21,6 +20,7 @@ interface Props {
   addItem: (item: Omit<Todo, "id">) => void;
 }
 
+// Utilitários
 function getDaysRemaining(dueDate: Date): number {
   const today = new Date();
   const msPerDay = 1000 * 60 * 60 * 24;
@@ -30,8 +30,20 @@ function getDaysRemaining(dueDate: Date): number {
 function getPriority(dueDate: Date): number {
   const daysRemaining = getDaysRemaining(dueDate);
   if (daysRemaining < 3) return 1;
-  else if (3 < daysRemaining && daysRemaining < 15) return 2;
-  else return 3;
+  else if (daysRemaining < 15) return 2;
+  return 3;
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("pt-BR");
+}
+
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
 
 export default function ModalAdd({
@@ -42,69 +54,77 @@ export default function ModalAdd({
   items,
   addItem,
 }: Props) {
+  const theme = useTheme();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState(3);
-  const [dueDate, setDueDate] = useState(""); // string formatada
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // para DateTimePicker
   const [tag, setTag] = useState("");
-  const [show, setShow] = useState(false);
-  const [mode, setMode] = useState<"date" | "time">("date");
-  const theme = useTheme();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<Date | null>(null);
+  const [finalDate, setFinalDate] = useState<Date | null>(null);
+  const [showDate, setShowDate] = useState(false);
+  const [showTime, setShowTime] = useState(false);
 
   useEffect(() => {
     if (item) {
-      const parsed = item.dueDate ? new Date(item.dueDate) : null;
-      setSelectedDate(parsed);
-      setDueDate(parsed ? parsed.toISOString().substring(0, 10) : "");
+      const parsed = item.dueDate ? new Date(item.dueDate) : new Date();
       setTitle(item.title || "");
       setDescription(item.description || "");
       setPriority(item.priority || 3);
       setTag(item.tag || "");
+      setSelectedDate(parsed);
+      setSelectedTime(parsed);
+      setFinalDate(parsed);
     } else {
-      setSelectedDate(null);
-      setDueDate("");
       setTitle("");
       setDescription("");
       setPriority(3);
       setTag("");
+      const now = new Date();
+      setSelectedDate(now);
+      setSelectedTime(now);
+      setFinalDate(now);
     }
   }, [item]);
 
-  const handleSave = () => {
-    if (!title || !dueDate) return;
+  const updateFinalDate = (date: Date | null, time: Date | null) => {
+    if (!date || !time) return;
+    const combined = new Date(date);
+    combined.setHours(time.getHours(), time.getMinutes(), 0, 0);
+    setFinalDate(combined);
+  };
 
-    const parsedDate = new Date(dueDate);
-    if (isNaN(parsedDate.getTime())) {
-      alert("Data inválida!");
-      return;
+  const onChangeDate = (_event: any, selected?: Date) => {
+    setShowDate(false);
+    if (selected) {
+      setSelectedDate(selected);
+      updateFinalDate(selected, selectedTime);
     }
+  };
+
+  const onChangeTime = (_event: any, selected?: Date) => {
+    setShowTime(false);
+    if (selected) {
+      setSelectedTime(selected);
+      updateFinalDate(selectedDate, selected);
+    }
+  };
+
+  const handleSave = () => {
+    if (!title || !finalDate) return;
 
     addItem({
       title,
       description,
       completed: false,
-      priority: getPriority(parsedDate),
-      createdAt: new Date().toString(),
-      dueDate: parsedDate.toString(),
+      priority: getPriority(finalDate),
+      createdAt: new Date().toISOString(),
+      dueDate: finalDate.toISOString(),
       tag,
     });
 
     setIsVisible(false);
     setItem(null);
-  };
-
-  const onChange = (_event: any, selected: Date | undefined) => {
-    setShow(false);
-    if (selected) {
-      setSelectedDate(selected);
-      setDueDate(selected.toISOString().substring(0, 10));
-    }
-  };
-
-  const showDatepicker = () => {
-    setMode("date");
-    setShow(true);
   };
 
   return (
@@ -142,17 +162,42 @@ export default function ModalAdd({
         />
 
         <View style={{ marginBottom: 10 }}>
-          <Button mode="outlined" onPress={showDatepicker}>
-            {dueDate ? `Prazo: ${dueDate}` : "Selecionar prazo"}
-          </Button>
+          <Text>Prazo:</Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 5 }}>
+            <Button
+              mode="outlined"
+              onPress={() => setShowDate(true)}
+              style={{ flex: 1, marginHorizontal: 2, borderRadius: 5 }}
+              textColor={theme.colors.onPrimaryContainer}
+            >
+              {selectedDate ? formatDate(selectedDate) : "Data"}
+            </Button>
+            <Button
+              mode="outlined"
+              onPress={() => setShowTime(true)}
+              style={{ flex: 1, marginHorizontal: 2, borderRadius: 5 }}
+              textColor={theme.colors.onPrimaryContainer}
+            >
+              {selectedTime ? formatTime(selectedTime) : "Hora"}
+            </Button>
+          </View>
         </View>
 
-        {show && (
+        {showDate && (
           <DateTimePicker
             value={selectedDate || new Date()}
-            mode={mode}
-            display="default"
-            onChange={onChange}
+            mode="date"
+            display="calendar"
+            onChange={onChangeDate}
+          />
+        )}
+
+        {showTime && (
+          <DateTimePicker
+            value={selectedTime || new Date()}
+            mode="time"
+            display="clock"
+            onChange={onChangeTime}
           />
         )}
 
@@ -167,7 +212,7 @@ export default function ModalAdd({
         <Button
           mode="contained"
           onPress={handleSave}
-          disabled={!title || !dueDate}
+          disabled={!title || !finalDate}
         >
           Salvar
         </Button>

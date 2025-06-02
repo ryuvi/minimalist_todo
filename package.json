@@ -13,6 +13,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-community/cli": "^18.0.0",
+    "@react-native-community/datetimepicker": "8.3.0",
     "@rneui/base": "^0.0.0-edge.2",
     "@rneui/themed": "^0.0.0-edge.2",
     "@types/pouchdb": "^6.4.2",
@@ -34,6 +35,7 @@
     "pouchdb-react-native": "^6.4.1",
     "react": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-element-dropdown": "^2.12.4",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-mmkv": "^3.2.0",
     "react-native-paper": "^5.14.5",
@@ -43,8 +45,7 @@
     "react-native-screens": "~4.10.0",
     "react-native-uuid": "^2.0.3",
     "react-native-vector-icons": "^10.2.0",
-    "zustand": "^5.0.5",
-    "@react-native-community/datetimepicker": "8.3.0"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

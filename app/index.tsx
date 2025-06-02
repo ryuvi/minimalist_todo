@@ -175,6 +175,12 @@ function TodoItem({ item, index, deletedItems, onDelete, onComplete, onOpen }) {
                 position: "absolute",
                 top: 5,
                 right: 5,
+                fontSize: 16,
+                padding: 5,
+                height: 30,
+                width: 30,
+                borderRadius: 15,
+                fontWeight: 'bold'
               }}
             >
               {item.priority}
@@ -194,7 +200,7 @@ function TodoItem({ item, index, deletedItems, onDelete, onComplete, onOpen }) {
                 marginRight: 5,
               }}
             >
-              <Text style={{ color: theme.colors.tertiary }}>
+              <Text style={{ color: theme.colors.onPrimaryContainer }}>
                 Prazo: {formatDate(new Date(item.dueDate))}
               </Text>
             </View>

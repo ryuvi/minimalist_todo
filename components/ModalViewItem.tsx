@@ -78,13 +78,13 @@ export default function ModalViewItem({
             Editar
           </Button>
 
-          <Button
+          {/* <Button
             mode="contained"
             buttonColor={colors.error}
             onPress={() => onDelete(item.id)}
           >
             Excluir
-          </Button>
+          </Button> */}
         </View>
       </Modal>
     </Portal>
