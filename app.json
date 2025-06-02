@@ -4,11 +4,11 @@
     "slug": "prioriza",
     "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/prioriza.webp",
+    "icon": "./assets/prioriza.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/prioriza-splash.webp",
+      "image": "./assets/prioriza-splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,14 +17,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/prioriza.webp",
+        "foregroundImage": "./assets/prioriza.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.indexcore.prioriza"
     },
     "web": {
-      "favicon": "./assets/prioriza.webp"
+      "favicon": "./assets/prioriza.png"
     },
     "plugins": [
       "expo-router"

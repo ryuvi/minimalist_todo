@@ -1,4 +1,4 @@
-package com.hero.prioriza
+package com.indexcore.prioriza
 
 import android.os.Build
 import android.os.Bundle

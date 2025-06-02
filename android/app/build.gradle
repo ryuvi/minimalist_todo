@@ -87,13 +87,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.hero.prioriza'
+    namespace 'com.indexcore.prioriza'
     defaultConfig {
-        applicationId 'com.hero.prioriza'
+        applicationId 'com.indexcore.prioriza'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.2"
+        versionName "1.1.0"
     }
     signingConfigs {
         debug {
